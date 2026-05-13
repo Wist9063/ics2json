@@ -1,0 +1,5 @@
+# Copy this file to e.g. work.yml or personal.yml.
+# url is required; color and name are optional.
+url: https://calendar.google.com/calendar/ical/REPLACE_ME/basic.ics
+color: "#4285f4"
+# name: "Custom Display Name"  # defaults to the filename

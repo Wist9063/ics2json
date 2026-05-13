@@ -1,0 +1,13 @@
+# Real feeds contain private ICS URLs (bearer secrets) — never commit.
+feeds/*.yml
+feeds/*.yaml
+!feeds/example.yml.sample
+
+# Node
+node_modules/
+npm-debug.log*
+
+# Editor / OS
+.DS_Store
+.vscode/
+.idea/
