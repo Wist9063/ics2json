@@ -1,0 +1,18 @@
+services:
+  ics2json:
+    image: ghcr.io/wist9063/ics2json:latest
+    container_name: ics2json
+    restart: unless-stopped
+    read_only: true
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 128m
+    pids_limit: 64
+    volumes:
+      - ./feeds:/app/feeds:ro
+    # Bound to loopback only as feed URLs are bearer secrets.
+    # Drop the `ports:` block entirely when embedding alongside a dashboard
+    # on the same compose network (reach it at http://ics2json:8000/).
+    ports:
+      - "127.0.0.1:8000:8000"

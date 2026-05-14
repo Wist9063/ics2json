@@ -11,12 +11,25 @@ I built this for embedding into dashboards like [Glance](https://github.com/glan
 
 ## Quick start
 
+Prebuilt images are published to GHCR for `linux/amd64` and `linux/arm64`:
+
+```bash
+mkdir -p ./ics2json/feeds   # drop your *.yml feeds here (see below)
+docker compose up -d
+curl http://127.0.0.1:8000/events.json
+```
+
+The included [`docker-compose.yml`](./docker-compose.yml) pulls `ghcr.io/wist9063/ics2json:latest` and binds port 8000 to loopback only.
+
+### Embedding alongside a dashboard
+
+When running on the same compose network as e.g. Glance, drop the `ports:` block. The dashboard reaches the sidecar over the internal network and no host port is exposed:
+
 ```yaml
-# docker-compose.yml
 services:
   ics2json:
+    image: ghcr.io/wist9063/ics2json:latest
     container_name: ics2json
-    build: ./ics2json
     restart: unless-stopped
     read_only: true
     cap_drop: [ALL]
@@ -26,15 +39,10 @@ services:
     pids_limit: 64
     volumes:
       - ./ics2json/feeds:/app/feeds:ro
-    # Deliberately no `ports:` — only your dashboard reaches it
-    # via the internal compose network as http://ics2json:8000/.
+    # No `ports:`: only your dashboard reaches it
 ```
 
-Bring it up:
-
-```bash
-docker compose up -d --build ics2json
-```
+> Building from source instead? Swap `image:` for `build: .` and run `docker compose up -d --build`.
 
 ## Adding a calendar
 
