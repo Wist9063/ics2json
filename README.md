@@ -1,6 +1,6 @@
 # ics2json
 
-A tiny Node.js sidecar that turns one or more **ICS / iCalendar** feeds into a single JSON endpoint of upcoming events. 
+A tiny Node.js sidecar that turns one or more **ICS / iCalendar** feeds into a single JSON endpoint of upcoming events.
 
 I built this for embedding into dashboards like [Glance](https://github.com/glanceapp/glance) without exposing the (secret) ICS feed URLs to the dashboard renderer or the host network.
 
@@ -62,6 +62,7 @@ color: "#fbbc04"        # optional — defaults to a stable hash of the name
 Save the file → the sidecar picks it up within ~1 second. Delete the file → its events disappear on the next request. No restart.
 
 > **Where to find a "private ICS URL":**
+>
 > - Google Calendar → Settings & sharing → "Secret address in iCal format"
 > - Apple iCloud → Calendar → share with public link → copy URL (rewrite `webcal://` → `https://`)
 > - Outlook / Microsoft 365 → Calendar → "Publish a calendar"
@@ -72,6 +73,7 @@ Save the file → the sidecar picks it up within ~1 second. Delete the file → 
 ### `GET /events.json`
 
 Example response:
+
 ```json
 {
   "events": [
@@ -98,6 +100,7 @@ Example response:
 - Per-feed errors surface in `errors[]` as `{ name, message }` only — **never** the URL.
 
 ### `GET /healthz`
+
 For docker's healthcheck. Returns 200 if the server is up and the config dir is readable, 500 otherwise.
 
 ```json
@@ -136,9 +139,10 @@ For docker's healthcheck. Returns 200 if the server is up and the config dir is 
 
 ## Security model
 
-ICS feed URLs are bearer secrets. So, anyone with the URL can read your calendar. 
+ICS feed URLs are bearer secrets. So, anyone with the URL can read your calendar.
 
 The design treats them as such:
+
 1. **URLs never leave the trust boundary.** Stored only in `feeds/*.yml`, mounted **read-only** into the container. The HTTP API never echoes the URL.
 2. **No SSRF surface.** The sidecar refuses to fetch a URL given over HTTP, feeds come only from disk.
 3. **Sidecar is unreachable from the host.** No `ports:` published. Only the internal compose network reaches port 8000.
@@ -148,8 +152,6 @@ The design treats them as such:
 7. **Pinned dependencies, zero advisories** at the time of the lockfile (`npm audit --omit=dev` clean).
 
 ## Tunables (env vars)
-
-All knobs are configurable at runtime — no code edits needed.
 
 | Env var | Default | What it does |
 |---|---|---|
@@ -164,6 +166,5 @@ Set them via `environment:` in compose, or `-e KEY=VAL` with `docker run`. Inval
 
 ## Limitations
 
-- All-day events use the local-date convention from the source feed — multi-day all-days work but timezone-only-defined events may render in UTC.
+- All-day events use the local-date convention from the source feed. Multi-day all-days work but timezone-only-defined events may render in UTC.
 - `node-ical` covers most RRULE patterns but exotic ones (e.g. `BYSETPOS` combined with `BYWEEKNO`) may differ from Google's expansion.
-- One process, one config dir — no multi-tenancy.
