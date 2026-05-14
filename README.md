@@ -147,14 +147,20 @@ The design treats them as such:
 6. **Output safe for HTML embedding.** Glance's `html/template` auto-escapes string fields; the only raw value (`color`) is server-side validated against `^#[0-9a-fA-F]{6}$`.
 7. **Pinned dependencies, zero advisories** at the time of the lockfile (`npm audit --omit=dev` clean).
 
-## Tunables (in `app.js`)
+## Tunables (env vars)
 
-| Constant | Default | What it does |
+All knobs are configurable at runtime — no code edits needed.
+
+| Env var | Default | What it does |
 |---|---|---|
-| `WINDOW_MS` | 30 days | How far ahead to include events |
-| `CACHE_TTL_MS` | 10 minutes | Per-feed parsed-events cache lifetime |
-| `FETCH_TIMEOUT_MS` | 10 s | Per-feed network timeout |
-| `MAX_EVENTS` | 50 | Cap on events returned |
+| `PORT` | `8000` | HTTP listen port |
+| `FEEDS_DIR` | `/app/feeds` | Where to read `*.yml` feed configs from |
+| `WINDOW_DAYS` | `30` | How far ahead to include events |
+| `CACHE_TTL_MINUTES` | `10` | Per-feed parsed-events cache lifetime |
+| `FETCH_TIMEOUT_SECONDS` | `10` | Per-feed network timeout |
+| `MAX_EVENTS` | `50` | Cap on events returned |
+
+Set them via `environment:` in compose, or `-e KEY=VAL` with `docker run`. Invalid values fall back to the default and log a warning at startup.
 
 ## Limitations
 
